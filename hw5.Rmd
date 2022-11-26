@@ -1,0 +1,144 @@
+---
+title: "stats101a_hw5"
+author: "Takao"
+date: "2/9/2022"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## (1)
+
+```{r}
+library(readxl)
+water_data <- read_excel("water.xlsx", sheet = "Sheet1")
+head(water_data)
+```
+
+### a
+
+```{r}
+plot(water_data$`Vapor pressure (mm Hg)` ~ water_data$`Temperature (K)`, xlab = "temperature", ylab = "vapor pressure")
+```
+
+Looking at the scatter diagram, a non-linear relationship seems appropriate in relating pressure (y) to temperature (x). 
+
+### b
+
+```{r}
+slr.model1 <- lm(water_data$`Vapor pressure (mm Hg)` ~ water_data$`Temperature (K)`)
+
+b.coeff1 <- coefficients(slr.model1) 
+
+plot(water_data$`Vapor pressure (mm Hg)` ~ water_data$`Temperature (K)`, xlab = "temperature", ylab = "vapor pressure")
+abline(a = b.coeff1[1], b = b.coeff1[2]) 
+```
+
+### c
+
+```{r}
+anova(slr.model1)
+```
+
+The ANOVA table shows a p-value of 0.0002117 Based on a significance level of $\alpha = 0.05$, we have significance evidence to reject the null hypothesis. since 0.0002117 < 0.05. There is sufficient evidence that the linear regression model is appropriate.
+
+### d
+
+```{r}
+par(mfrow=c(2,2)); plot(slr.model1)
+```
+
+Looking at the residuals vs fitted plot for this data set, we can see that there is a clear trend. The red line does not seem to be straight on residuals = 0 and is curvy with the residuals spreading approximately from -100 to more than a 100. Thus, we can conclude that the linear regression model is not adequate. 
+
+### e
+
+```{r}
+# a
+Pv <- log(water_data$`Vapor pressure (mm Hg)`)
+ttemp <- (-1/water_data$`Temperature (K)`)
+
+plot(Pv ~ ttemp, xlab = "-1/temperature", ylab = "log(vapor pressure)")
+
+# b
+slr.model3 <- lm(Pv ~ ttemp)
+b.coeff3 <- coefficients(slr.model3) 
+plot(Pv ~ ttemp, xlab = "-1/temperature", ylab = "log(vapor pressure)")
+abline(a = b.coeff3[1], b = b.coeff3[2]) 
+
+# c
+anova(slr.model3)
+```
+The ANOVA table shows a p-value of 0.00000000000000022 Based on a significance level of $\alpha = 0.05$, we have significance evidence to reject the null hypothesis. since 0.00000000000000022 < 0.05. There is sufficient evidence that the new linear regression model is appropriate.
+
+```{r}
+# d
+par(mfrow=c(2,2)); plot(slr.model3)
+
+```
+Looking at the residuals vs fitted plot for the new model, we can see how there is a clear trend. The red line in the plot seems to be in a upside down u shaped. However, if we look at the values of the residuals, we can see that they are very small since the range for the residuals values are between approximately -0.03 and 0.03. Thus, although the shape of the graphs indicate otherwise, we can say that this new relationship fits the linear regression model better than the original.
+
+
+
+## (2)
+
+```{r}
+electric_utility_data <- read_excel("electric_utility.xlsx", sheet = "Sheet1")
+head(electric_utility_data)
+```
+
+### a
+
+```{r}
+plot(electric_utility_data$y ~ electric_utility_data$x, xlab = "Total Monthly Energy Usage During the Month", ylab = "Peak-Hour Demand")
+```
+
+### b
+
+```{r}
+slr.model2 <- lm(electric_utility_data$y ~ electric_utility_data$x)
+
+b.coeff2 <- coefficients(slr.model2) 
+
+plot(electric_utility_data$y ~ electric_utility_data$x, xlab = "Total Monthly Energy Usage During the Month", ylab = "Peak-Hour Demand")
+abline(a = b.coeff2[1], b = b.coeff2[2]) 
+```
+
+### c
+
+```{r}
+anova(slr.model2)
+```
+
+The ANOVA table shows a p-value of 0.000000000000008808 Based on a significance level of $\alpha = 0.05$, we have significance evidence to reject the null hypothesis. since 0.000000000000008808 < 0.05. There is sufficient evidence that the linear regression model is appropriate.
+
+### d
+
+```{r}
+par(mfrow=c(2,2)); plot(slr.model2)
+```
+
+Looking at the residuals vs fitted plot, there does not seem to be a funnel shape, however, there seems to be a slight trend in the red line in this plot.
+Because of the trend, there seems to be more residuals that are positive. Thus, we can say that the equality of variance assumption is not completely satisfied.
+Since the equality of variance assumption is not satisfied, we cannot say that the linear model assumption is adequate for this data set. 
+
+### e
+
+```{r}
+bc.slr1 <- lm((electric_utility_data$y^{0.5})~electric_utility_data$x)
+par(mfrow=c(2,2)); plot(bc.slr1)
+```
+Looking at the residuals vs fitted plot for this newly transformed data set, we can see that there seems to be much less of a trend in the residuals. There also doesn't seem to be a funnel shape indicating that the residuals are not increasing as the fitted values increase. Thus, we can say that the equality of variance assumption is satisfied and the transformation on y using the square-root of y as the response stabilize the inequality of variance problem noted in part d. 
+
+
+
+
+
+
+
+
+
+

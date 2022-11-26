@@ -1,0 +1,162 @@
+---
+title: "stats101a_hw8"
+author: "Takao"
+date: "3/4/2022"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## 1
+
+```{r}
+inverter_data <- read.csv("inverter.csv", row.names = 1)
+head(inverter_data)
+```
+
+### (a)
+
+```{r}
+mlr.model1 <- lm(y~x1+x2+x3+x4+x5, data = inverter_data)
+summary(mlr.model1)
+```
+
+This F-statistic is shown at the bottom of the output above. The p-value is calculated using a reference distribution F with 5 and 19 degrees of freedom. At a level of $\alpha = 0.01$, we *reject* the null hypothesis since the p-value is 0.00523865038 which is smaller than this value of $\alpha$. Therefore, we conclude that at least one of the predictors in the model has a significant explanatory power.
+
+
+### (b)
+
+```{r}
+summary(mlr.model1)
+```
+
+1. The width of the NMOS device does have a significant association with the transient point in volts, when the predictors length of the NMOS device,width of the PMOS device, length of the PMOS device, and the temperature in celcius are all in the model.
+2. The length of the NMOS device does have a significant association with the transient point in volts, when the predictors width of the NMOS device, width of the PMOS device, length of the PMOS device, and the temperature in celcius are all in the model.
+3. The width of the PMOS device does have a significant association with the transient point in volts, when the predictors width of the NMOS device, length of the NMOS device, length of the PMOS device, and the temperature in celcius are all in the model.
+4. The length of the PMOS device does have a significant association with the transient point in volts, when the predictors width of the NMOS device, length of the NMOS device, width of the PMOS device, and the temperature in celcius are all in the model.
+5. The temperatrue in celcius does not have a significant association with the transient point in volts, when the predictors width of the NMOS device, length of the NMOS device, width of the PMOS device, and the length of the PMOS device are all in the model.
+
+
+### (c)
+
+```{r}
+mlr.model1mod <- lm(y~x1+x2+x3+x4, data = inverter_data)
+summary(mlr.model1mod)
+```
+
+This F-statistic is shown at the bottom of the output above. The p-value is calculated using a reference distribution F with 4 and 20 degrees of freedom. At a level of $\alpha = 0.01$, we *reject* the null hypothesis since the p-value is 0.00191658113 which is smaller than this value of $\alpha$. Therefore, we conclude that at least one of the predictors in the model has a significant explanatory power.
+
+1. The width of the NMOS device does have a significant association with the transient point in volts, when the predictors length of the NMOS device,width of the PMOS device, and length of the PMOS device are all in the model.
+2. The length of the NMOS device does have a significant association with the transient point in volts, when the predictors width of the NMOS device,width of the PMOS device, and length of the PMOS device are all in the model.
+3. The width of the PMOS device device does have a significant association with the transient point in volts, when the predictors width of the NMOS device, length of the NMOS device, and length of the PMOS device are all in the model.
+4. The length of the PMOS device device does have a significant association with the transient point in volts, when the predictors width of the NMOS device, length of the NMOS device, and width of the PMOS device are all in the model.
+
+
+### (d)
+
+```{r}
+anova(mlr.model1)
+anova(mlr.model1mod)
+```
+As we can see, the MSE decreased from the original model to the reduced model.
+This intuitively makes sense because the mean squared error decreases as the model error decreases (as the model has less error, the data points fall closer to the regression line, thus decreasing the MSE).
+In part c, we deleted x5 from the model which was proven to have no significant association with transient point in volts. Thus, by removing x5, an "insignificant" regressor, the MSE decreased, which indicates that the model error decreased.
+
+### (e)
+
+```{r}
+rstudent(mlr.model1mod)
+rstudent(mlr.model1)
+
+```
+Looking at the output given above, it seems like observation 2 seems unusually large. Additionally, observation 4 and 8 can possibly be unusually large as well.
+
+
+### (f)
+
+```{r}
+inverter_data_mod <- inverter_data[-2, ]
+inverter_data_mod
+mlr.model1modmod <- lm(y ~ x1 + x2 + x3 + x4, data = inverter_data_mod)
+summary(mlr.model1modmod)
+```
+
+The Multiple R squared for this model is 0.804369567 which is considerably higher than the multiple R squared for the original model which was 0.558413452, and 0.556898857 for the modified model in part c. 
+This is because the second observation was a bad leverage point and thus, when utilizing this data point in the model to construct linear models, the model was highly influenced by this one point and thus caused the multiple R squared to go down. The newly modified model with the removed observation has a significantly better fit using the linear model compared to the other two models.
+ 
+
+### (g)
+
+```{r}
+summary(mlr.model1modmod)
+```
+This F-statistic is shown at the bottom of the output above. The p-value is calculated using a reference distribution F with 4 and 19 degrees of freedom. At a level of $\alpha = 0.01$, we *reject* the null hypothesis since the p-value is 1.60411554e-06 which is smaller than this value of $\alpha$. Therefore, we conclude that at least one of the predictors in the model has a significant explanatory power.
+
+1. The width of the NMOS device does have a significant association with the transient point in volts, when the predictors length of the NMOS device,width of the PMOS device, and length of the PMOS device are all in the model.
+2. The length of the NMOS device does have a significant association with the transient point in volts, when the predictors width of the NMOS device,width of the PMOS device, and length of the PMOS device are all in the model.
+3. The width of the PMOS device device does have a significant association with the transient point in volts, when the predictors width of the NMOS device, length of the NMOS device, and length of the PMOS device are all in the model.
+4. The length of the PMOS device device does have a significant association with the transient point in volts, when the predictors width of the NMOS device, length of the NMOS device, and width of the PMOS device are all in the model.
+
+
+### (h)
+
+```{r}
+plot(mlr.model1modmod)
+```
+
+2*4/25
+A point is considered a high leverage point if their levarage score is greater than 0.32. There seems to be four high levarage points in this data set. Now we look at the scale-location plot to evaluate the assumption of constant variance of the errors. There seems to be a clear trend/pattern looking at the red line in this plot. Not considering the high levarage points, we look at the residuals vs fitted plot, and this plot shows the same conclusion where there is a clear trend in the red line. Thus, we can say that the assumption of constant variance is not met.
+
+```{r}
+par(mfrow=c(1,2))
+plot(inverter_data_mod$x1, inverter_data_mod$y)
+lines(loess.smooth(inverter_data_mod$x1, inverter_data_mod$y), lwd = 2.5, col = "blue")
+scatter.smooth(inverter_data_mod$x1, mlr.model1modmod$fitted.values)
+lines(loess.smooth(inverter_data_mod$x1, mlr.model1modmod$fitted.values), lwd = 2.5, col = "red", lty = 'dashed')
+```
+
+The two plots agree with each other, thus, the model is correctly capturing the relationship between y and x1.
+
+```{r}
+par(mfrow=c(1,2))
+plot(inverter_data_mod$x2, inverter_data_mod$y)
+lines(loess.smooth(inverter_data_mod$x2, inverter_data_mod$y), lwd = 2.5, col = "blue")
+scatter.smooth(inverter_data_mod$x2, mlr.model1modmod$fitted.values)
+lines(loess.smooth(inverter_data_mod$x2, mlr.model1modmod$fitted.values), lwd = 2.5, col = "red", lty = 'dashed')
+```
+
+The two plots agree with each other, thus, the model is correctly capturing the relationship between y and x2.
+
+```{r}
+par(mfrow=c(1,2))
+plot(inverter_data_mod$x3, inverter_data_mod$y)
+lines(loess.smooth(inverter_data_mod$x3, inverter_data_mod$y), lwd = 2.5, col = "blue")
+scatter.smooth(inverter_data_mod$x3, mlr.model1modmod$fitted.values)
+lines(loess.smooth(inverter_data_mod$x3, mlr.model1modmod$fitted.values), lwd = 2.5, col = "red", lty = 'dashed')
+```
+
+The two plots agree with each other, thus, the model is correctly capturing the relationship between y and x3.
+
+```{r}
+par(mfrow=c(1,2))
+plot(inverter_data_mod$x4, inverter_data_mod$y)
+lines(loess.smooth(inverter_data_mod$x4, inverter_data_mod$y), lwd = 2.5, col = "blue")
+scatter.smooth(inverter_data_mod$x4, mlr.model1modmod$fitted.values)
+lines(loess.smooth(inverter_data_mod$x4, mlr.model1modmod$fitted.values), lwd = 2.5, col = "red", lty = 'dashed')
+```
+The two plots agree with each other, thus, the model is correctly capturing the relationship between y and x4.
+
+## 2
+
+1. I really was able to analytically determine the relationship between two variables. For example, when I took AP statistics in high school, I learned about one sample t tests and one sample proportion tests, however, I was not able to get a complete grasp of the concepts as I basically was mimicing what I have dow during lectures. Through this course, I was really about to understand the real-world applications and how different testing methods actually works and takes place. 
+
+2. I learned about regression diagnostics. Although there could be significance in the made conclusinos initially, when an individual closely looks at and analyzes the asssumptions made, these conclusions can turn out to be invalid. For example, unless closely analyzing the assumption of constant variacnes using plots of residuals, the complete model can turn useless and additionally, there are mutiple methods to complete these analytical procedures.
+
+3. I was able to learn about applicable R codes and techniques. Until I took this course, I was only educated with the basic R codes and simple functions. Through this course, I was able to really dig into certain functions such as lm() and plot() and anova(). I was able to touch the surface of what to do as a data analysist or data scientist performing tests for significant of regressions and correlations. 
+
+Thank you so much for an amazing quarter! 

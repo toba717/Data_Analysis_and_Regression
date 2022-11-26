@@ -1,0 +1,151 @@
+---
+title: "stats101a_hw7"
+author: "Takao"
+date: "2/23/2022"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r}
+winequality <- read.csv("winequality-red.csv")
+head(winequality)
+```
+
+
+## 1
+
+```{r}
+mlr.model1 <- lm(quality~fixed.acidity + volatile.acidity + citric.acid + residual.sugar + chlorides + free.sulfur.dioxide + total.sulfur.dioxide + density + pH + sulphates + alcohol, data = winequality)
+mlr.model1
+```
+
+## 2
+
+```{r}
+summary(mlr.model1)
+```
+
+This F-statistic is shown at the bottom of the output above. The p-value is calculated using a reference distribution F with 11 and 1582 degrees of freedom. At a level of $\alpha = 0.05$, we *reject* the null hypothesis since the p-value is less than 2.2e-16 which is smaller than this value of $\alpha$. Therefore, we conclude that at least one of the predictors in the model has a significant explanatory power. 
+
+
+## 3
+
+```{r}
+summary(mlr.model1)
+```
+
+1. The fixed acidity does not have a significant association with the wine quality, when the predictors volatile acidity, citric acid, residual sugar, chlorides, free sulfur dioxide, total sulfur dioxide, density, pH, sulphates, and alcohol are in the model.
+2. The volatile acidity has a significant association with the wine quality, when the predictors fixed acidity, citric acid, residual sugar, chlorides, free sulfur dioxide, total sulfur dioxide, density, pH, sulphates, and alcohol are in the model.
+3. Citric acid does not have a significant association with the wine quality, when the predictors fixed acidity, volatile acidity, residual sugar, chlorides, free sulfur dioxide, total sulfur dioxide, density, pH, sulphates, and alcohol are in the model.
+4. Residual sugar does not have a significant association with the wine quality, when the predictors fixed acidity, volatile acidity, citric acid, chlorides, free sulfur dioxide, total sulfur dioxide, density, pH, sulphates, and alcohol are in the model.
+5. Chlorides have a significant association with the wine quality, when the predictors fixed acidity, volatile acidity, citric acid, residual sugar, free sulfur dioxide, total sulfur dioxide, density, pH, sulphates, and alcohol are in the model.
+6. Free sulfur dioxide does not have a significant association with the wine quality, when the predictors fixed acidity, volatile acidity, citric acid, residual sugar, chlorides, total sulfur dioxide, density, pH, sulphates, and alcohol are in the model.
+7. Total sulfur dioxide has a significant association with the wine quality, when the predictors fixed acidity, volatile acidity, citric acid, residual sugar, chlorides, free sulfur dioxide, density, pH, sulphates, and alcohol are in the model.
+8. Density does not have a significant association with the wine quality, when the predictors fixed acidity, volatile acidity, citric acid, residual sugar, chlorides, free sulfur dioxide, total sulfur dioxide, pH, sulphates, and alcohol are in the model.
+9. pH does not have a significant association with the wine quality, when the predictors fixed acidity, volatile acidity, citric acid, residual sugar, chlorides, free sulfur dioxide, total sulfur dioxide, density, sulphates, and alcohol are in the model.
+10. Sulphates does have a significant association with the wine quality, when the predictors fixed acidity, volatile acidity, citric acid, residual sugar, chlorides, free sulfur dioxide, total sulfur dioxide, density, pH, and alcohol are in the model.
+11. Alcohol does have a significant association with the wine quality, when the predictors fixed acidity, volatile acidity, citric acid, residual sugar, chlorides, free sulfur dioxide, total sulfur dioxide, density, pH, and sulphates are in the model.
+
+
+## 4
+
+```{r}
+confint(mlr.model1, level = 0.95)
+```
+
+fixed acidity:        (-2.632636e-02, 0.075927205)
+volatile acidity:     (-1.318587e+00, -0.842746528)
+citric acid:          (-4.688618e-01, 0.110356642)
+residual sugar:       (-1.321025e-02,  0.045737496)
+chlorides:            (-2.699427e+00, -1.051492426)
+free sulfur dioxide:   (2.305476e-04,  0.008811505)
+total sulfur dioxide: (-4.739889e-03, -0.001867774)
+density:              (-6.066512e+01, 24.403181166)
+pH:                   (-7.870578e-01, -0.033763209)
+sulphates:             (6.923631e-01, 1.141648686)
+alcohol:               (2.236199e-01, 0.327725225)
+
+
+## 5
+
+```{r}
+fasq <- winequality$fixed.acidity ^ 2
+vasq <- winequality$volatile.acidity ^ 2
+casq <- winequality$citric.acid ^ 2
+rssq <- winequality$residual.sugar ^ 2
+chsq <- winequality$chlorides ^ 2
+fsdsq <- winequality$free.sulfur.dioxide ^ 2
+tsdsq <- winequality$total.sulfur.dioxide ^ 2
+densq <- winequality$density ^ 2
+phsq <- winequality$pH ^ 2
+sulsq <- winequality$sulphates ^ 2
+alcsq <- winequality$alcohol ^ 2
+
+mlr.model2 <- lm(quality~fixed.acidity + fasq + volatile.acidity + vasq + citric.acid + casq + residual.sugar + rssq + chlorides + chsq + free.sulfur.dioxide + fsdsq + total.sulfur.dioxide + tsdsq + density + densq + pH + phsq + sulphates + sulsq + alcohol + alcsq, data = winequality)
+mlr.model2
+summary(mlr.model2)
+anova(mlr.model1, mlr.model2)
+```
+
+The null hypothesis is that all coefficients removed from the full model or the coefficients of the quadratic components are zero.
+The alternative hypothesis is that at leas tone of the coefficients removed from the full model is non-zero.
+
+The p-value from this partial F-test is smaller than our significance level $\alpha = 0.05$. Therefore, we reject the null hypothesis and conclude that the original model and the newly constructed quadratic model are statistically different models, given that all other predictors are in the model. 
+
+
+
+## 6
+
+```{r}
+summary(mlr.model1)
+```
+
+In this case for the original model (model 1), the $R^2$ and adjusted $R^2$ values are 0.3602 and 0.3559, respectively. Recall that high values are preferred. Ideally, these values are larger than, say, 70\%. 
+Thus, we can say that the R squared values are relatively low for the original model.
+
+```{r}
+summary(mlr.model2)
+```
+
+In this case for the original model (model 1), the $R^2$ and adjusted $R^2$ values are 0.3867 and 0.3781, respectively.
+Again, the adjusted R squared value is not very high.
+
+
+Although both models does not have very high adjusted R squared models, model 2 provides a better model according to this criterion.
+
+
+
+## 7
+```{r}
+data.for.prediction1 <- data.frame(fixed.acidity = c(6.2, 5.9, 6.3, 5.9, 6), volatile.acidity = c(0.6, 0.55, 0.51, 0.645, 0.31), citric.acid = c(0.08, 0.1, 0.13, 0.12, 0.47), residual.sugar = c(2, 2.2, 2.3, 2, 3.6), chlorides = c(0.09, 0.062, 0.076, 0.075, 0.067), free.sulfur.dioxide = c(32, 39, 29, 32, 18), total.sulfur.dioxide = c(44, 51, 40, 44, 42), density = c(0.9949, 0.99512, 0.99574, 0.99547, 0.99549), pH = c(3.45, 3.52, 3.42, 3.57, 3.39), sulphates = c(0.58, 0.76, 0.75, 0.71, 0.66), alcohol = c(10.5, 11.2, 11, 10.2, 11))
+
+
+
+predict(mlr.model1, data.for.prediction1, interval = "prediction", level = 0.95)
+```
+
+Using predictor values, we have these predicted scores of wines
+
+1. 5.533859
+2. 5.966468
+3. 5.946234
+4. 5.475676
+5. 6.009979
+
+
+## 8
+
+```{r}
+mlr.model1mod <- lm(quality~volatile.acidity + chlorides + total.sulfur.dioxide + sulphates + alcohol, data = winequality)
+summary(mlr.model1mod)
+```
+
+The reduced model that only contains significant predictors is shown above
+

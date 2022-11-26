@@ -1,0 +1,47 @@
+---
+title: "stats101A_hw1"
+author: "Takao"
+date: "1/8/2022"
+output:
+  html_document:
+    df_print: paged
+---
+
+## 3
+
+### (a)
+
+NULL Hypothesis: mu = 225 hours (The mean repair time is 225 hours)
+
+Althernative Hypothesis: mu > 225 hours (The mean repair time exceeds 225 hours)
+
+### (b)
+```{r}
+repair <- c(159, 280, 101, 212, 224, 379, 179, 264, 222, 362, 168, 250, 149, 260, 485, 170)
+
+t.test(repair - 225, alternative = "greater")
+```
+
+Since the p-value is greater than the significance level of 0.05, we fail to reject the null hypothesis. There is no significance evidence thatthe mean repair time exceeds 225 hours
+
+
+### (c)
+
+```{r}
+t.test(repair - 225, alternative = "greater")
+```
+
+The P-value for the test is 0.257.
+
+###(d)
+
+```{r}
+t.test(repair - 225)
+lowerv <- 225 - 36.107031
+upperv <- 225 + 69.10731
+confidenceinterval <- c(lowerv, upperv)
+confidenceinterval
+```
+
+The 95 percent confidence interval on the mean repair time is `r confidenceinterval`.
+We are 95 percent confident that the mean repair time for the specific electronic instrument is between 188.8930 hours and 294.1073 hours. 

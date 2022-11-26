@@ -1,0 +1,225 @@
+---
+title: "stats101A_hw2"
+author: "Takao"
+date: "1/15/2022"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+## 1
+
+```{r}
+# install.packages("readxl")
+library(readxl)
+
+houses_data <- read_excel("houses.xlsx", sheet = "Sheet1")
+
+head(houses_data)
+typeof(houses_data)
+dim(houses_data)
+
+```
+
+### (a)
+
+```{r}
+houses_data <- data.frame(houses_data)
+plot(c(houses_data[, 1], houses_data[, 3]) ~ c(houses_data[, 2], houses_data[, 4]), xlab = "taxes paid", ylab = "selling price")
+
+slr.model1 <- lm(c(houses_data[, 1], houses_data[, 3]) ~ c(houses_data[, 2], houses_data[, 4]))
+slr.model1
+coef(slr.model1)
+```
+The least squares model for this given data set is predicted sales price = 13.321 + 3.324*(taxes paid).
+
+```{r}
+e <- slr.model1$residuals 
+n <- length(e) 
+est.variance <- sum(e^2)/(n-2)
+print(est.variance)
+```
+The estimate of the variance is `r est.variance`.
+
+
+### (b)
+
+```{r}
+#Plug x = 7.50 into the simple linear regression model.
+sellingprice7.5 <- 13.321 + 3.324*7.5
+sellingprice7.5
+```
+The mean selling price given that the taxes paid are x = 7.50 is `r sellingprice7.5`.
+
+### (c)
+
+```{r}
+#First we must calculate the predicted value of y corresponding to x = 5.898.
+sellingprice5.898 <- 13.321 + 3.324*5.898
+sellingprice5.898
+
+```
+The predicted value of y corresponding to x = 5.898 is equal to `r sellingprice5.898`.
+
+```{r}
+houses_data[, 2] == 5.898
+houses_data[, 4] == 5.898
+houses_data[7, 1]
+#30.9 is the observed selling price of where the x is 5.898
+
+#To find the residual of the corresponding point, observed value - predicted value, thus
+residual5.898 <- 30.9 - sellingprice5.898
+residual5.898
+```
+The residual of the point where x = 5.898 is equal to `r residual5.898`.
+
+
+### (d)
+
+```{r}
+alltaxespaid <- c(houses_data[, 2], houses_data[, 4])
+alltaxespaid
+allsellingprice <- c(houses_data[, 1], houses_data[, 3])
+allsellingprice
+allpredicted <- 13.321 + 3.324*alltaxespaid
+allpredicted
+
+observe_vs_predict <- cbind(allsellingprice, allpredicted, alltaxespaid)
+observe_vs_predict
+```
+```{r}
+plot(allpredicted ~ allsellingprice)
+```
+
+If the relationship between y and x was a deterministic (no random error) straight line, all of the observed y or in this case observed selling price matches with the predicted y or predicted taxes paid. 
+The points in the plot y predicted vs y observed are fairly in a straight line and there is fairly small variation around this arbitrary line. Thus, it can be stated and concluded that the tax paid is an effective regressor variable in predicting the selling price. 
+
+
+
+## Problem 2
+
+```{r}
+indicators_data <- read_excel("indicators.xlsx", sheet = "Sheet1")
+
+head(indicators_data)
+dim(indicators_data)
+```
+
+### (a)
+
+```{r}
+#  Y = Percentage change in average price from July 2006 to July 2007 (based on
+# the S&P/Case-Shiller national housing index); and
+#  x = Percentage of mortgage loans 30 days or more overdue in latest quarter
+# (based on data from Equifax and Moody’s). 
+
+slr.model2 <- lm(PriceChange ~ LoanPaymentsOverdue, data = indicators_data)
+slr.model2
+
+
+confint(slr.model2, level = 0.95)
+```
+
+If, in repeated random sampling, we construct a large number of confident intervals, 95\% of those intervals will contain the true parameter value $\beta_1$. This is because confidence interval are random variables so it may be that this confidence interval that was generated does not include the true parameter value, but this "idea" of repeating the same process over and over again works.
+
+In practice, we can say that we are 95\% confident that the interval (-4.163, -0.334) contains the true value of the slope $\beta_1$.
+
+The constructed 95% confidence interval does not contain the value 0 and the entire interval is negative. Thus, there is sufficient evidence that there is a significant negative linear association of the percentage of mortgage loans 30 days or more overdue in latest quarter and the percentage change in average price from July 2006 to July 2007. 
+
+
+### (b)
+
+```{r}
+data.for.prediction <- data.frame(LoanPaymentsOverdue = 4)
+predict(slr.model2, data.for.prediction, interval = "confidence")
+```
+
+We are 95\% confident that the interval between (-6.649, -2.310) contains the true expected value of the percentage change in average price from July 2006 to July 2007 given that the percentage of mortgage loans 30 days or more in latest quarter is 4 percent.
+
+0% is not a feasible value for E(Y|X = 4) because 0% is outside of the 95 percent confidence interval that we constructed. 
+
+
+## Problem 3
+
+
+### (a)
+
+```{r}
+#degree of freedom = n - 2 = 30 - 2 = 28
+# critical value from the table using df = 28 and confidence interval = 95%, critical value = 2.0481
+# since we are interested in finding the 95 percent confidence interval for the start-up time, beta0, we look at the intercept estimate and intercept std. error.
+# intercept estimate = 0.6417099
+# intercept std. error = 0.1222707
+
+# beta0 +- std. error*critical value
+# intercept estimate +- intercept std. error*critical value
+
+higher <- 0.6417099 + 0.1222707*2.0481
+higher
+lower <- 0.6417099 - 0.1222707*2.0481
+lower
+c(lower, higher)
+
+```
+
+We are 95\% confident that the interval between (0.391, 0.892) contains the true start-up time. 
+
+
+### (b)
+
+
+Null hypothesis: beta1 = 0.01 (The true processing time for an additional invoice is 0.01 hours)
+Alternative hypothesis: beta1 != 0.01 (The true processing time for an additional invoice is not 0.01 hours)
+
+Since we are interesting in performing a test for beta1, we will be looking at the invoice estimate and invoice std. error.
+
+Invoice estimate = 0.0112916
+Invoice std. error = 0.0008184
+
+We must obtain the test statistic
+
+t = (predicted beta1 - observed beta1) / standard error of predicted beta1
+
+observed beta1 = 0.01
+
+t statistic = (0.0112916 - 0.01) / 0.0008184
+
+```{r}
+(0.0112916 - 0.01) / 0.0008184
+```
+
+t statistic = 1.578201
+
+To reject null hypothesis, the test statistic must be greater than critical value, thus to find critical value,
+
+```{r}
+qt(1 - 0.025, 28)
+```
+
+Since the test statistic is not greater than the critical value, we fail to reject the null hypothesis that the average processing time for an aditional invoice is 0.01 hours. 
+
+### (c)
+
+
+n or the sample size is 28 + 2 = 30
+Using the table of critical values of t distribution using degree of freedom 28 and a CI of 95%, we get a critical value of 2.0481.
+Residual standard error is 0.3298.
+
+First, we get the expected time plugging in 130 into x
+```{r}
+expected130 <- 0.6417099 + 0.0112916*130
+expected130
+```
+
+Now to find the confidence interval, we must add and subtract the margin of error to this expected time to process 130 invoices
+Plug numbers into margin of error formula ((x-xbar)^2 = 0 so this component is all 0). 
+
+```{r}
+margin_of_error <- qt(1 - 0.025, 28) * sqrt(1 + (1/30))*0.3298
+margin_of_error
+high <- expected130 + margin_of_error
+low <- expected130 - margin_of_error
+c(low, high)
+```
+
+We are 95% confident that the interval between (1.423, 2.796) contains the true time taken to process 130 invoices. 

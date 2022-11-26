@@ -1,0 +1,104 @@
+---
+title: "stats101A_hw3"
+author: "Takao"
+date: "1/19/2022"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+## 1
+
+```{r}
+football_data <- read.csv("football.csv")
+head(football_data)
+```
+
+### (a)
+
+The response variable is the number of games won or Games.Won
+The predictor variable is the number of yards gained rushing by opponents or Opponent.Rushing.Yards
+
+
+### (b)
+
+```{r}
+slr.model1 <- lm(Games.Won ~ Opponent.Rushing.Yards, data = football_data)
+print(slr.model1)
+b.coeff <- coefficients(slr.model1)
+
+plot(football_data$Games.Won ~ football_data$Opponent.Rushing.Yards, xlab = "# of yards gained rushing by opponents", ylab = "# of games won")
+
+abline(a = b.coeff[1], b = b.coeff[2])
+
+b.coeff
+```
+Intercept = 21.788251
+In the 1976 National Football League, we predict the number of games won (per 14-game season) by a team is 21.788251 games when the number of yards gained rushing by opponents is 0 yards. 
+
+Slope = -0.0070251
+In the 1976 National Football League, we predict that the number of games won (per 14-game season) by a team will decrease by 0.0070251 games when the number of yards gained rushing by opponents increases by 1 yard. 
+
+
+### (c)
+
+```{r}
+anova(slr.model1)
+```
+
+The ANOVA table shows a p-value of 0.000007381. Based on a significance level of $\alpha = 0.05$, we have significance evidence to reject the null hypothesis. since 0.000007381 < 0.05. There is sufficient evidence that the number of yards gained rushing by opponents has an effect on the number of games won (per 14-game season) by a team. 
+
+
+### (d)
+
+```{r}
+confint(slr.model1, level = 0.95)
+```
+
+(-0.009614347, -0.004435854)
+
+If, in repeated random sampling, we construct a large number of confidence intervals, 95\% of those intervals will contain the true parameter value $\beta_1$. 
+
+We are 95\% confident that the interval (-0.009614347, -0.004435854) contains the true value of the slope $\beta_1$.
+
+### (e)
+
+```{r}
+summary(slr.model1)
+```
+The value of $R^2$ is shown at the output "Multiple R-squared:  0.5447" 
+This means that the model $Y = \beta_0 + \beta_1 x + \epsilon$ explains 54.47\% of the total variability in the response number of games won (per 14-game season) by a team. 
+
+
+### (f)
+
+Using the jargon of the problem, we know that this is a mean response so this is a confidence interval, not a prediction interval
+
+```{r}
+dataprediction <- data.frame(Opponent.Rushing.Yards = 2000)
+
+predict(slr.model1, dataprediction, interval = "confidence", level = 0.95)
+```
+
+(6.765753, 8.710348)
+
+We are 95% confident that the interval (6.765753, 8.710348) contains the true mean number of games won if the opponents' yards rushing is 2000 yards. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
